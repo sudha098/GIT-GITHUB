@@ -11,6 +11,7 @@ Configure Git
 Now let Git know who you are. This is important for version control systems, as each Git commit uses this information:
 
 git config --global user.name "John Doe"
+
 git config --global user.email "John@abc.com"
 
 Change the user name and e-mail address to your own. You will probably also want to use this when registering to GitHub later on.
@@ -24,7 +25,9 @@ Creating Git Folder
 Now, let's create a new folder for our project:
 
 mkdir myproject
+
 cd myproject
+
 git init 
 
 Git Adding New Files
@@ -173,8 +176,211 @@ git checkout master
 Now we merge the current branch (master) with development:
 git merge development
 
-Merge Conflict
+#Push Local Repository to GitHub
+--------------------------------
+git remote add origin https://github.com/sudha098/GIT-GITHUB.git
+
+git remote add origin URL specifies that you are adding a remote repository, with the specified URL, as an origin to your local Git repo.
+
+Now we are going to push our master branch to the origin url, and set it as the default remote branch:
+
+git push --set-upstream origin master
+
+Note: Since this is the first time you are connecting to GitHub, you will get some kind of notification you to authenticate this connection
+
+Git Pull from GitHub
+--------------------
+
+Pulling to Keep up-to-date with Changes
+When working as a team on a project, it is important that everyone stays up to date.
+
+Any time you start working on a project, you should get the most recent changes to your local copy.
+
+With Git, you can do that with pull.
+
+pull is a combination of 2 different commands:
+
+1. fetch
+2. merge
+Let's take a closer look into how fetch, merge, and pull works.
+
+Git Fetch
+----------
+fetch gets all the change history of a tracked branch/repo.
+
+So, on your local Git, fetch updates to see what has changed on GitHub:
+
+git fetch origin
+
+Now that we have the recent changes, we can check our status:
+    git status
+We are behind the origin/master by 1 commit. That should be the updated README.md, but lets double check by viewing the log: git log origin/master
+That looks as expected, but we can also verify by showing the differences between our local master and origin/master:
+    git diff origin/master
+That looks precisely as expected! Now we can safely merge.
+
+Git Merge
+---------
+merge combines the current branch, with a specified branch.
+
+We have confirmed that the updates are as expected, and we can merge our current branch (master) with origin/master:
+
+git merge origin/master
+
+Git Pull
+--------
+But what if you just want to update your local repository, without going through all those steps?
+
+pull is a combination of fetch and merge. It is used to pull all changes from a remote repository into the branch you are working on.
+
+Make another change to the Readme.md file on GitHub.
+
+Use pull to update our local Git:
+    git pull origin
+
+# Git GitHub Fork
+
+Add to Someone Else's Repository
+--------------------------------
+
+At the heart of Git is collaboration. However, Git does not allow you to add code to someone else's repository without access rights.
+
+In these next 3 chapters we will show you how to copy a repository, make changes to it, and suggest those changes be implemented to the original repository.
+
+Fork a Repository
+------------------
+A fork is a copy of a repository. This is useful when you want to contribute to someone else's project or start your own project based on theirs.
+
+fork is not a command in Git, but something offered in GitHub and other repository hosts. Let's start by logging in to GitHub, and fork our repository:
+    https://github.com/sudha098/GIT-GITHUB.github.io
+
+Configuring Remotes
+-------------------
+Basically, we have a full copy of a repository, whose origin we are not allowed to make changes to.
+
+Let's see how the remotes of this Git is set up:
+git remote -v
+
+We see that origin is set up to the original "w3schools-test" repository, we also want to add our own fork.
+
+First, we rename the original origin remote:
+
+Example
+git remote rename origin upstream
+git remote -v
+
+Then fetch the URL of our own fork:
+And add that as origin:
+git remote add origin https://github.com/sudha098/GIT-GITHUB.github.git
+git remote -v
+
+
+Note: According to Git naming conventions, it is recommended to name your own repository origin, and the one you forked for upstream
+
+Now we have 2 remotes:
+
+origin - our own fork, where we have read and write access
+upstream - the original, where we have read-only access
+
+# Git Revert
+------------
+
+revert is the command we use when we want to take a previous commit and add it as a new commit, keeping the log intact.
+
+Step 1: Find the previous commit:
+
+Step 2: Use it to make a new commit:
+
+Let's make a new commit, where we have "accidentally" deleted a file:
+
+Now we have a part in our commit history we want to go back to. Let's try and do that with revert.
+
+Git Revert Find Commit in Log
+-----------------------------
+First thing, we need to find the point we want to return to. To do that, we need to go through the log.
+
+To avoid the very long log list, we are going to use the --oneline option, which gives just one line per commit showing:
+
+The first seven characters of the commit hash
+the commit message
+So let's find the point we want to revert:
+git log --oneline
+
+Git Revert HEAD
+---------------
+We revert the latest commit using git revert HEAD (revert the latest change,  and then commit), adding the option --no-edit to skip the commit message editor (getting the default revert message):
+
+Example
+git revert HEAD --no-edit
+
+Now let's check the log again:
+
+Example
+git log --oneline
+
+Note: To revert to earlier commits, use git revert HEAD~x (x being a number. 1 going back one more, 2 going back two more, etc.)
+
+# GIT RESET
+-----------
+
+Git Reset
+reset is the command we use when we want to move the repository back to a previous commit, discarding any changes made after that commit.
+
+Step 1: Find the previous commit
+Step 2: Move the repository back to that step
+
+Git Reset Find Commit in Log
+
+First thing, we need to find the point we want to return to. To do that, we need to go through the log.
+
+To avoid the very long log list, we are going to use the --oneline option, which gives just one line per commit showing:
+
+The first seven characters of the commit hash - this is what we need to refer to in our reset command.
+the commit message
+So let's find the point we want to reset to:
+    git log --oneline
+
+We reset our repository back to the specific commit using git reset commithash (commithash being the first 7 characters of the commit hash we found in the log):
+
+Example
+    git reset 9a9add8
+Now let's check the log again:
+
+Example
+    git log --oneline
+
+Warning: Messing with the commit history of a repository can be dangerous. It is usually ok to make these kinds of changes to your own local repository. However, you should avoid making changes that rewrite history to remote repositories, especially if others are working with them.
+
+
+Git Undo Reset
 --------------
+Even though the commits are no longer showing up in the log, it is not removed from Git.
 
+If you know the commit hash you can reset to it:
+    git reset e56ba1f
+    git log --oneline
 
+# Git Amend
+Git commit --amend
 
+commit --amend is used to modify the most recent commit.
+
+It combines changes in the staging environment with the latest commit, and creates a new commit.
+
+This new commit replaces the latest commit entirely.
+
+Git Amend Commit Message
+-------------------------
+
+One of the simplest things you can do with --amend is to change a commit message.
+
+Let's update the README.md and commit:
+    git commit -m "Adding plines to readme"
+    git log --oneline
+Oh no! the commit message is full of spelling errors. Embarrassing. Let's amend that:
+    git commit --amend -m "Added lines to README.md"
+And re-check the log
+
+Git Amend Files
+----------------
+Adding files with --amend works the same way as above. Just add them to the staging environment before committing.
